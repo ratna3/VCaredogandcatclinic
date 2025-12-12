@@ -157,7 +157,7 @@ function AnimatedModel({ url, autoRotate = true }: ModelProps) {
     const maxDim = Math.max(size.x, size.y, size.z);
     
     // Target size for normalization - models should be roughly this size before Bounds handles them
-    const targetSize = 2;
+    const targetSize = 3;
     const scale = maxDim > 0 ? targetSize / maxDim : 1;
     
     // Center the model at the geometric center (not just bottom)
@@ -186,16 +186,15 @@ function AnimatedModel({ url, autoRotate = true }: ModelProps) {
       // Create mixer for the cloned scene
       mixerRef.current = new THREE.AnimationMixer(clonedScene);
       
-      // Play ALL animation clips
-      animations.forEach((clip) => {
-        const action = mixerRef.current!.clipAction(clip);
-        action.reset();
-        action.setLoop(THREE.LoopRepeat, Infinity);
-        action.clampWhenFinished = false;
-        action.setEffectiveTimeScale(1);
-        action.setEffectiveWeight(1);
-        action.play();
-      });
+      // Play only the first (main) animation clip to prevent glitchy overlapping animations
+      const mainClip = animations[0];
+      const action = mixerRef.current.clipAction(mainClip);
+      action.reset();
+      action.setLoop(THREE.LoopRepeat, Infinity);
+      action.clampWhenFinished = false;
+      action.setEffectiveTimeScale(1);
+      action.setEffectiveWeight(1);
+      action.play();
     }
 
     return () => {
@@ -301,7 +300,7 @@ function CanvasContent({
       
       <Suspense fallback={<LoadingSpinner />}>
         {/* Bounds component to auto-fit the model in view */}
-        <Bounds key={modelUrl} fit clip observe margin={2.5}>
+        <Bounds key={modelUrl} fit clip observe margin={1.8}>
           {useFallback ? (
             <FallbackPet type={petType} autoRotate={autoRotate} />
           ) : (
