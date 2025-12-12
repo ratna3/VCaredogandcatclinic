@@ -106,7 +106,6 @@ export default function ModelCarousel({ models, title = 'Meet Our Friends' }: Mo
         <div className="mx-12">
           <Model3DViewer
             modelUrl={currentModel.modelUrl}
-            scale={currentModel.scale}
             autoRotate={true}
             petType={currentModel.type === 'cat' ? 'cat' : 'dog'}
           />
