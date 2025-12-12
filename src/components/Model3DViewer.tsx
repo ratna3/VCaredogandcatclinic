@@ -122,7 +122,7 @@ function FallbackPet({ type = 'dog', autoRotate = true }: { type?: 'dog' | 'cat'
   );
 }
 
-function AnimatedModel({ url, targetSize = 2, position = [0, 0, 0], rotation = [0, 0, 0], autoRotate = true }: ModelProps) {
+function AnimatedModel({ url, targetSize = 1.2, position = [0, 0, 0], rotation = [0, 0, 0], autoRotate = true }: ModelProps) {
   const groupRef = useRef<THREE.Group>(null);
   const { scene, animations } = useGLTF(url);
   const mixerRef = useRef<THREE.AnimationMixer | null>(null);
@@ -138,12 +138,22 @@ function AnimatedModel({ url, targetSize = 2, position = [0, 0, 0], rotation = [
     return targetSize / maxDimension;
   }, [clonedScene, targetSize]);
 
-  // Calculate center offset to center the model
-  const centerOffset = useMemo(() => {
+  // Calculate offset to position model with feet at shadow level (Y = -0.8)
+  const positionOffset = useMemo(() => {
     const box = new THREE.Box3().setFromObject(clonedScene);
     const center = new THREE.Vector3();
     box.getCenter(center);
-    return [-center.x * autoScale, -center.y * autoScale, -center.z * autoScale] as [number, number, number];
+    
+    // Center X and Z, but position Y so bottom of model is at shadowLevel
+    const shadowLevel = -0.8;
+    const scaledMinY = box.min.y * autoScale;
+    const yOffset = shadowLevel - scaledMinY;
+    
+    return [
+      -center.x * autoScale,
+      yOffset,
+      -center.z * autoScale
+    ] as [number, number, number];
   }, [clonedScene, autoScale]);
 
   useEffect(() => {
@@ -181,7 +191,7 @@ function AnimatedModel({ url, targetSize = 2, position = [0, 0, 0], rotation = [
 
   return (
     <group ref={groupRef} position={position} rotation={rotation}>
-      <group position={centerOffset}>
+      <group position={positionOffset}>
         <primitive object={clonedScene} scale={autoScale} />
       </group>
     </group>
@@ -267,11 +277,11 @@ function CanvasContent({
           </ModelErrorBoundary>
         )}
         <ContactShadows
-          position={[0, -1.2, 0]}
-          opacity={0.4}
-          scale={10}
-          blur={2}
-          far={4}
+          position={[0, -0.8, 0]}
+          opacity={0.5}
+          scale={8}
+          blur={1.5}
+          far={3}
         />
         <Environment preset="studio" />
       </Suspense>
@@ -279,9 +289,9 @@ function CanvasContent({
         enablePan={false}
         enableZoom={true}
         minDistance={2}
-        maxDistance={10}
+        maxDistance={8}
         autoRotate={false}
-        target={[0, 0, 0]}
+        target={[0, 0.2, 0]}
       />
     </>
   );
@@ -293,7 +303,7 @@ export default function Model3DViewer({
   autoRotate = true,
   className = '',
   petType = 'dog',
-  targetSize = 2,
+  targetSize = 1.2,
 }: Model3DViewerProps) {
   const [useFallback, setUseFallback] = useState(false);
   const [canvasError, setCanvasError] = useState(false);
@@ -317,10 +327,11 @@ export default function Model3DViewer({
   // Calculate responsive target size based on container
   const responsiveTargetSize = useMemo(() => {
     const minDimension = Math.min(containerSize.width, containerSize.height);
-    // Base target size of 2, scaled down for smaller containers
+    // Base target size scaled for container
     const baseSize = targetSize * scale;
-    if (minDimension < 300) return baseSize * 0.7;
-    if (minDimension < 400) return baseSize * 0.85;
+    if (minDimension < 250) return baseSize * 0.6;
+    if (minDimension < 350) return baseSize * 0.8;
+    if (minDimension < 450) return baseSize * 0.9;
     return baseSize;
   }, [containerSize, targetSize, scale]);
 
@@ -355,7 +366,7 @@ export default function Model3DViewer({
   return (
     <div ref={containerRef} className={`canvas-container ${className}`}>
       <Canvas
-        camera={{ position: [0, 0.5, 4], fov: 45 }}
+        camera={{ position: [0, 0.2, 3.5], fov: 50 }}
         shadows
         gl={{ antialias: true, alpha: true }}
         onError={() => setCanvasError(true)}
