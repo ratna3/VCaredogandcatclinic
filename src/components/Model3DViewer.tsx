@@ -124,6 +124,7 @@ function AnimatedModel({ url, autoRotate = true }: ModelProps) {
   const groupRef = useRef<THREE.Group>(null);
   const { scene, animations } = useGLTF(url);
   const mixerRef = useRef<THREE.AnimationMixer | null>(null);
+  const actionsRef = useRef<THREE.AnimationAction[]>([]);
   const bounds = useBounds();
   
   // Clone the scene using SkeletonUtils for proper skinned mesh/animation support
@@ -131,10 +132,13 @@ function AnimatedModel({ url, autoRotate = true }: ModelProps) {
     // SkeletonUtils.clone properly clones skeletons and bones for animations
     const clone = SkeletonUtils.clone(scene) as THREE.Group;
     
-    // Configure mesh properties
+    // Configure mesh properties - SkeletonUtils.clone already properly handles skeleton binding
     clone.traverse((child) => {
       if (child instanceof THREE.SkinnedMesh) {
         child.frustumCulled = false;
+        // Note: Do NOT call skeleton.calculateInverses() here!
+        // SkeletonUtils.clone preserves the correct inverse bind matrices from the original model.
+        // Recalculating them would corrupt the skeleton and cause mesh deformations (e.g., bent tails).
       }
       if (child instanceof THREE.Mesh) {
         child.castShadow = true;
@@ -180,37 +184,125 @@ function AnimatedModel({ url, autoRotate = true }: ModelProps) {
     return () => clearTimeout(timer);
   }, [bounds, url]);
 
+  // Clone animations and retarget to the cloned scene
+  const clonedAnimations = useMemo(() => {
+    if (!animations || animations.length === 0) return [];
+    
+    // Clone each animation clip to avoid sharing state with original
+    return animations.map(clip => {
+      const clonedClip = clip.clone();
+      
+      // Optimize tracks - remove any tracks with no keyframes or problematic tracks
+      clonedClip.tracks = clonedClip.tracks.filter(track => {
+        // Keep tracks that have valid keyframe data
+        return track.times.length > 0 && track.values.length > 0;
+      });
+      
+      // Reset the clip duration based on the tracks
+      clonedClip.resetDuration();
+      
+      return clonedClip;
+    });
+  }, [animations]);
+
   // Setup animations
   useEffect(() => {
-    if (animations && animations.length > 0) {
-      // Create mixer for the cloned scene
+    if (clonedAnimations.length > 0) {
+      // Stop any existing animations first
+      if (mixerRef.current) {
+        mixerRef.current.stopAllAction();
+        actionsRef.current = [];
+      }
+      
+      // Create new mixer for the cloned scene
       mixerRef.current = new THREE.AnimationMixer(clonedScene);
       
-      // Play all animation clips to ensure all parts of the model animate properly
-      // Some models (like Pitbull) have multiple clips that need to play together
-      animations.forEach((clip) => {
-        const action = mixerRef.current!.clipAction(clip);
-        action.reset();
-        action.setLoop(THREE.LoopRepeat, Infinity);
-        action.clampWhenFinished = false;
-        action.setEffectiveTimeScale(1);
-        action.setEffectiveWeight(1);
-        action.play();
-      });
+      // Find the best animation clip to play
+      // Priority: walk/locomotion animations > run > idle > loop > longest clip
+      // Exclude: get_up, stand, sit, lay, sleep type animations
+      const findBestClip = () => {
+        const clipNames = clonedAnimations.map(c => c.name.toLowerCase());
+        
+        // Patterns to exclude (non-locomotion, setup animations)
+        const excludePatterns = ['get_up', 'getup', 'stand_up', 'standup', 'sit', 'lay', 'sleep', 'rest', 'down'];
+        
+        // Filter out excluded animations if there are other options
+        const filteredAnimations = clonedAnimations.filter((clip, index) => {
+          const name = clipNames[index];
+          const isExcluded = excludePatterns.some(pattern => name.includes(pattern));
+          return !isExcluded;
+        });
+        
+        // Use filtered list if available, otherwise use all animations
+        const animationsToSearch = filteredAnimations.length > 0 ? filteredAnimations : clonedAnimations;
+        const namesToSearch = animationsToSearch.map(c => c.name.toLowerCase());
+        
+        // Look for locomotion animations first (walking is most natural for pet display)
+        const locomotionPriorities = ['walk', 'walking', 'trot', 'run', 'running', 'move'];
+        for (const priority of locomotionPriorities) {
+          const index = namesToSearch.findIndex(name => name.includes(priority));
+          if (index !== -1) {
+            return animationsToSearch[index];
+          }
+        }
+        
+        // Then look for other common animations
+        const otherPriorities = ['idle', 'loop', 'anim', 'take'];
+        for (const priority of otherPriorities) {
+          const index = namesToSearch.findIndex(name => name.includes(priority));
+          if (index !== -1) {
+            return animationsToSearch[index];
+          }
+        }
+        
+        // Fall back to the longest clip from filtered list (most likely the main animation)
+        return animationsToSearch.reduce((longest, clip) => 
+          clip.duration > longest.duration ? clip : longest
+        , animationsToSearch[0]);
+      };
+      
+      const bestClip = findBestClip();
+      
+      // Create action with proper settings for smooth looping
+      const action = mixerRef.current.clipAction(bestClip);
+      
+      // Reset action state completely
+      action.stop();
+      action.reset();
+      
+      // Configure for smooth infinite looping
+      action.setLoop(THREE.LoopRepeat, Infinity);
+      action.clampWhenFinished = false;
+      action.zeroSlopeAtStart = true;
+      action.zeroSlopeAtEnd = true;
+      
+      // Use default time scale and full weight
+      action.setEffectiveTimeScale(1);
+      action.setEffectiveWeight(1);
+      
+      // Enable the action and play
+      action.enabled = true;
+      action.play();
+      
+      actionsRef.current = [action];
     }
 
     return () => {
       if (mixerRef.current) {
+        actionsRef.current.forEach(action => action.stop());
+        actionsRef.current = [];
         mixerRef.current.stopAllAction();
         mixerRef.current = null;
       }
     };
-  }, [clonedScene, animations]);
+  }, [clonedScene, clonedAnimations]);
 
   useFrame((state, delta) => {
-    // Update animation mixer
+    // Update animation mixer with clamped delta to prevent large jumps
     if (mixerRef.current) {
-      mixerRef.current.update(delta);
+      // Clamp delta to prevent animation glitches from large time jumps
+      const clampedDelta = Math.min(delta, 0.1);
+      mixerRef.current.update(clampedDelta);
     }
     
     // Auto rotate the group
