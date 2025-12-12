@@ -7,8 +7,6 @@ import * as THREE from 'three';
 
 interface ModelProps {
   url: string;
-  position?: [number, number, number];
-  rotation?: [number, number, number];
   autoRotate?: boolean;
   onError?: () => void;
 }
@@ -121,38 +119,57 @@ function FallbackPet({ type = 'dog', autoRotate = true }: { type?: 'dog' | 'cat'
   );
 }
 
-function AnimatedModel({ url, position = [0, 0, 0], rotation = [0, 0, 0], autoRotate = true }: ModelProps) {
+function AnimatedModel({ url, autoRotate = true }: ModelProps) {
   const groupRef = useRef<THREE.Group>(null);
   const { scene, animations } = useGLTF(url);
   const mixerRef = useRef<THREE.AnimationMixer | null>(null);
-  const clonedScene = useMemo(() => scene.clone(), [scene]);
+  
+  // Clone the scene to avoid issues with multiple instances
+  const clonedScene = useMemo(() => {
+    const clone = scene.clone();
+    
+    // Ensure all skinned meshes have properly cloned skeletons
+    clone.traverse((child) => {
+      if (child instanceof THREE.SkinnedMesh) {
+        child.frustumCulled = false;
+      }
+      if (child instanceof THREE.Mesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+    });
+    
+    return clone;
+  }, [scene]);
 
-  // Center the model on XZ plane and place on ground (Y=0)
+  // Calculate centering offset to place model on ground
   const centerOffset = useMemo(() => {
     const box = new THREE.Box3().setFromObject(clonedScene);
     const center = new THREE.Vector3();
     box.getCenter(center);
     
-    // Center on X and Z, lift so bottom is at Y=0
-    const offset: [number, number, number] = [
-      -center.x,
-      -box.min.y,  // Lift model so its bottom is at y=0
-      -center.z
-    ];
-    
-    return offset;
+    // Center on X and Z, place bottom at Y=0
+    return {
+      x: -center.x,
+      y: -box.min.y,
+      z: -center.z
+    };
   }, [clonedScene]);
 
+  // Setup animations
   useEffect(() => {
-    // Setup animation mixer for the cloned scene
     if (animations && animations.length > 0) {
+      // Create mixer for the cloned scene
       mixerRef.current = new THREE.AnimationMixer(clonedScene);
       
+      // Play ALL animation clips
       animations.forEach((clip) => {
         const action = mixerRef.current!.clipAction(clip);
         action.reset();
         action.setLoop(THREE.LoopRepeat, Infinity);
         action.clampWhenFinished = false;
+        action.setEffectiveTimeScale(1);
+        action.setEffectiveWeight(1);
         action.play();
       });
     }
@@ -170,6 +187,7 @@ function AnimatedModel({ url, position = [0, 0, 0], rotation = [0, 0, 0], autoRo
     if (mixerRef.current) {
       mixerRef.current.update(delta);
     }
+    
     // Auto rotate the group
     if (autoRotate && groupRef.current) {
       groupRef.current.rotation.y += delta * 0.3;
@@ -177,8 +195,8 @@ function AnimatedModel({ url, position = [0, 0, 0], rotation = [0, 0, 0], autoRo
   });
 
   return (
-    <group ref={groupRef} position={position} rotation={rotation}>
-      <group position={centerOffset}>
+    <group ref={groupRef}>
+      <group position={[centerOffset.x, centerOffset.y, centerOffset.z]}>
         <primitive object={clonedScene} />
       </group>
     </group>
@@ -236,23 +254,30 @@ function CanvasContent({
 }) {
   return (
     <>
-      <ambientLight intensity={0.7} />
+      {/* Lighting setup for better visibility */}
+      <ambientLight intensity={0.8} />
       <directionalLight
-        position={[5, 5, 5]}
-        intensity={1.2}
+        position={[5, 8, 5]}
+        intensity={1.5}
         castShadow
         shadow-mapSize-width={1024}
         shadow-mapSize-height={1024}
       />
+      <directionalLight
+        position={[-5, 5, -5]}
+        intensity={0.5}
+      />
       <spotLight
-        position={[-5, 5, 5]}
-        angle={0.3}
+        position={[0, 10, 0]}
+        angle={0.5}
         penumbra={1}
-        intensity={0.6}
+        intensity={0.8}
         castShadow
       />
+      
       <Suspense fallback={<LoadingSpinner />}>
-        <Bounds fit observe margin={1.5}>
+        {/* Bounds component to auto-fit the model in view */}
+        <Bounds fit clip observe margin={1.3}>
           {useFallback ? (
             <FallbackPet type={petType} autoRotate={autoRotate} />
           ) : (
@@ -261,22 +286,27 @@ function CanvasContent({
             </ModelErrorBoundary>
           )}
         </Bounds>
+        
         <ContactShadows
           position={[0, 0, 0]}
-          opacity={0.4}
-          scale={8}
-          blur={2}
-          far={4}
+          opacity={0.5}
+          scale={10}
+          blur={2.5}
+          far={5}
         />
         <Environment preset="studio" />
       </Suspense>
+      
+      {/* Camera controls */}
       <OrbitControls
         enablePan={false}
         enableZoom={true}
-        minDistance={2}
-        maxDistance={10}
+        minDistance={3}
+        maxDistance={15}
         autoRotate={false}
-        target={[0, 0.6, 0]}
+        target={[0, 1, 0]}
+        minPolarAngle={Math.PI / 6}
+        maxPolarAngle={Math.PI / 2}
       />
     </>
   );
@@ -312,7 +342,7 @@ export default function Model3DViewer({
   return (
     <div ref={containerRef} className={`canvas-container ${className}`}>
       <Canvas
-        camera={{ position: [0, 1.2, 5], fov: 40 }}
+        camera={{ position: [0, 2, 6], fov: 35 }}
         shadows
         gl={{ antialias: true, alpha: true }}
         onError={() => setCanvasError(true)}
