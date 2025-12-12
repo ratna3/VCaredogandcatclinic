@@ -1,13 +1,12 @@
 'use client';
 
 import { Suspense, useRef, useState, useEffect, Component, ReactNode, useMemo } from 'react';
-import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, Environment, ContactShadows, useGLTF, Center, Bounds } from '@react-three/drei';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { OrbitControls, Environment, ContactShadows, useGLTF, Bounds } from '@react-three/drei';
 import * as THREE from 'three';
 
 interface ModelProps {
   url: string;
-  targetSize?: number;
   position?: [number, number, number];
   rotation?: [number, number, number];
   autoRotate?: boolean;
@@ -122,39 +121,27 @@ function FallbackPet({ type = 'dog', autoRotate = true }: { type?: 'dog' | 'cat'
   );
 }
 
-function AnimatedModel({ url, targetSize = 1.2, position = [0, 0, 0], rotation = [0, 0, 0], autoRotate = true }: ModelProps) {
+function AnimatedModel({ url, position = [0, 0, 0], rotation = [0, 0, 0], autoRotate = true }: ModelProps) {
   const groupRef = useRef<THREE.Group>(null);
   const { scene, animations } = useGLTF(url);
   const mixerRef = useRef<THREE.AnimationMixer | null>(null);
   const clonedScene = useMemo(() => scene.clone(), [scene]);
 
-  // Calculate auto-scale to normalize model size
-  const autoScale = useMemo(() => {
-    const box = new THREE.Box3().setFromObject(clonedScene);
-    const size = new THREE.Vector3();
-    box.getSize(size);
-    const maxDimension = Math.max(size.x, size.y, size.z);
-    if (maxDimension === 0) return 1;
-    return targetSize / maxDimension;
-  }, [clonedScene, targetSize]);
-
-  // Calculate offset to position model with feet at shadow level (Y = -0.8)
-  const positionOffset = useMemo(() => {
+  // Center the model on XZ plane and place on ground (Y=0)
+  const centerOffset = useMemo(() => {
     const box = new THREE.Box3().setFromObject(clonedScene);
     const center = new THREE.Vector3();
     box.getCenter(center);
     
-    // Center X and Z, but position Y so bottom of model is at shadowLevel
-    const shadowLevel = -0.8;
-    const scaledMinY = box.min.y * autoScale;
-    const yOffset = shadowLevel - scaledMinY;
+    // Center on X and Z, lift so bottom is at Y=0
+    const offset: [number, number, number] = [
+      -center.x,
+      -box.min.y,  // Lift model so its bottom is at y=0
+      -center.z
+    ];
     
-    return [
-      -center.x * autoScale,
-      yOffset,
-      -center.z * autoScale
-    ] as [number, number, number];
-  }, [clonedScene, autoScale]);
+    return offset;
+  }, [clonedScene]);
 
   useEffect(() => {
     // Setup animation mixer for the cloned scene
@@ -191,8 +178,8 @@ function AnimatedModel({ url, targetSize = 1.2, position = [0, 0, 0], rotation =
 
   return (
     <group ref={groupRef} position={position} rotation={rotation}>
-      <group position={positionOffset}>
-        <primitive object={clonedScene} scale={autoScale} />
+      <group position={centerOffset}>
+        <primitive object={clonedScene} />
       </group>
     </group>
   );
@@ -230,23 +217,19 @@ function CanvasErrorFallback({ type }: { type?: 'dog' | 'cat' }) {
 
 interface Model3DViewerProps {
   modelUrl: string;
-  scale?: number;
   autoRotate?: boolean;
   className?: string;
   petType?: 'dog' | 'cat';
-  targetSize?: number;
 }
 
 // Inner canvas content with model or fallback
 function CanvasContent({ 
   modelUrl, 
-  targetSize, 
   autoRotate, 
   petType,
   useFallback
 }: { 
   modelUrl: string; 
-  targetSize: number; 
   autoRotate: boolean; 
   petType: 'dog' | 'cat';
   useFallback: boolean;
@@ -269,19 +252,21 @@ function CanvasContent({
         castShadow
       />
       <Suspense fallback={<LoadingSpinner />}>
-        {useFallback ? (
-          <FallbackPet type={petType} autoRotate={autoRotate} />
-        ) : (
-          <ModelErrorBoundary fallback={<FallbackPet type={petType} autoRotate={autoRotate} />}>
-            <AnimatedModel url={modelUrl} targetSize={targetSize} autoRotate={autoRotate} />
-          </ModelErrorBoundary>
-        )}
+        <Bounds fit observe margin={1.5}>
+          {useFallback ? (
+            <FallbackPet type={petType} autoRotate={autoRotate} />
+          ) : (
+            <ModelErrorBoundary fallback={<FallbackPet type={petType} autoRotate={autoRotate} />}>
+              <AnimatedModel url={modelUrl} autoRotate={autoRotate} />
+            </ModelErrorBoundary>
+          )}
+        </Bounds>
         <ContactShadows
-          position={[0, -0.8, 0]}
-          opacity={0.5}
+          position={[0, 0, 0]}
+          opacity={0.4}
           scale={8}
-          blur={1.5}
-          far={3}
+          blur={2}
+          far={4}
         />
         <Environment preset="studio" />
       </Suspense>
@@ -289,9 +274,9 @@ function CanvasContent({
         enablePan={false}
         enableZoom={true}
         minDistance={2}
-        maxDistance={8}
+        maxDistance={10}
         autoRotate={false}
-        target={[0, 0.2, 0]}
+        target={[0, 0.6, 0]}
       />
     </>
   );
@@ -299,60 +284,21 @@ function CanvasContent({
 
 export default function Model3DViewer({
   modelUrl,
-  scale = 1,
   autoRotate = true,
   className = '',
   petType = 'dog',
-  targetSize = 1.2,
 }: Model3DViewerProps) {
   const [useFallback, setUseFallback] = useState(false);
   const [canvasError, setCanvasError] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [containerSize, setContainerSize] = useState({ width: 400, height: 400 });
 
-  // Responsive container sizing
+  // Only use fallback if no model URL provided
   useEffect(() => {
-    const updateSize = () => {
-      if (containerRef.current) {
-        const { width, height } = containerRef.current.getBoundingClientRect();
-        setContainerSize({ width, height });
-      }
-    };
-
-    updateSize();
-    window.addEventListener('resize', updateSize);
-    return () => window.removeEventListener('resize', updateSize);
-  }, []);
-
-  // Calculate responsive target size based on container
-  const responsiveTargetSize = useMemo(() => {
-    const minDimension = Math.min(containerSize.width, containerSize.height);
-    // Base target size scaled for container
-    const baseSize = targetSize * scale;
-    if (minDimension < 250) return baseSize * 0.6;
-    if (minDimension < 350) return baseSize * 0.8;
-    if (minDimension < 450) return baseSize * 0.9;
-    return baseSize;
-  }, [containerSize, targetSize, scale]);
-
-  // Check if the model URL is valid (not empty)
-  useEffect(() => {
-    // If no model URL or it's clearly invalid, use fallback
     if (!modelUrl || modelUrl === '') {
       setUseFallback(true);
-      return;
+    } else {
+      setUseFallback(false);
     }
-
-    // Try to check if the model exists
-    fetch(modelUrl, { method: 'HEAD' })
-      .then(response => {
-        if (!response.ok) {
-          setUseFallback(true);
-        }
-      })
-      .catch(() => {
-        setUseFallback(true);
-      });
   }, [modelUrl]);
 
   if (canvasError) {
@@ -366,7 +312,7 @@ export default function Model3DViewer({
   return (
     <div ref={containerRef} className={`canvas-container ${className}`}>
       <Canvas
-        camera={{ position: [0, 0.2, 3.5], fov: 50 }}
+        camera={{ position: [0, 1.2, 5], fov: 40 }}
         shadows
         gl={{ antialias: true, alpha: true }}
         onError={() => setCanvasError(true)}
@@ -374,7 +320,6 @@ export default function Model3DViewer({
       >
         <CanvasContent
           modelUrl={modelUrl}
-          targetSize={responsiveTargetSize}
           autoRotate={autoRotate}
           petType={petType}
           useFallback={useFallback}
