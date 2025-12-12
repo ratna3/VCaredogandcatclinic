@@ -2,8 +2,9 @@
 
 import { Suspense, useRef, useState, useEffect, Component, ReactNode, useMemo } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Environment, ContactShadows, useGLTF, Bounds } from '@react-three/drei';
+import { OrbitControls, Environment, ContactShadows, useGLTF, Bounds, useBounds } from '@react-three/drei';
 import * as THREE from 'three';
+import * as SkeletonUtils from 'three/addons/utils/SkeletonUtils.js';
 
 interface ModelProps {
   url: string;
@@ -123,12 +124,14 @@ function AnimatedModel({ url, autoRotate = true }: ModelProps) {
   const groupRef = useRef<THREE.Group>(null);
   const { scene, animations } = useGLTF(url);
   const mixerRef = useRef<THREE.AnimationMixer | null>(null);
+  const bounds = useBounds();
   
-  // Clone the scene to avoid issues with multiple instances
+  // Clone the scene using SkeletonUtils for proper skinned mesh/animation support
   const clonedScene = useMemo(() => {
-    const clone = scene.clone();
+    // SkeletonUtils.clone properly clones skeletons and bones for animations
+    const clone = SkeletonUtils.clone(scene) as THREE.Group;
     
-    // Ensure all skinned meshes have properly cloned skeletons
+    // Configure mesh properties
     clone.traverse((child) => {
       if (child instanceof THREE.SkinnedMesh) {
         child.frustumCulled = false;
@@ -142,19 +145,38 @@ function AnimatedModel({ url, autoRotate = true }: ModelProps) {
     return clone;
   }, [scene]);
 
-  // Calculate centering offset to place model on ground
-  const centerOffset = useMemo(() => {
+  // Calculate model size and normalize scale
+  const { centerOffset, normalizedScale } = useMemo(() => {
     const box = new THREE.Box3().setFromObject(clonedScene);
     const center = new THREE.Vector3();
+    const size = new THREE.Vector3();
     box.getCenter(center);
+    box.getSize(size);
     
-    // Center on X and Z, place bottom at Y=0
+    // Calculate scale to normalize all models to a smaller target size for better visibility
+    const maxDim = Math.max(size.x, size.y, size.z);
+    const targetSize = 1.5; // Smaller target size to ensure full model fits in view
+    const scale = maxDim > 0 ? targetSize / maxDim : 1;
+    
+    // Center the model at the geometric center (not just bottom)
     return {
-      x: -center.x,
-      y: -box.min.y,
-      z: -center.z
+      centerOffset: {
+        x: -center.x,
+        y: -center.y, // Center vertically at geometric center, not bottom
+        z: -center.z
+      },
+      normalizedScale: scale
     };
   }, [clonedScene]);
+
+  // Refresh bounds after model is positioned and scaled
+  useEffect(() => {
+    // Use a small delay to ensure the model is fully loaded and positioned
+    const timer = setTimeout(() => {
+      bounds.refresh().clip().fit();
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [bounds, url]);
 
   // Setup animations
   useEffect(() => {
@@ -195,7 +217,7 @@ function AnimatedModel({ url, autoRotate = true }: ModelProps) {
   });
 
   return (
-    <group ref={groupRef}>
+    <group ref={groupRef} scale={normalizedScale}>
       <group position={[centerOffset.x, centerOffset.y, centerOffset.z]}>
         <primitive object={clonedScene} />
       </group>
@@ -277,12 +299,12 @@ function CanvasContent({
       
       <Suspense fallback={<LoadingSpinner />}>
         {/* Bounds component to auto-fit the model in view */}
-        <Bounds fit clip observe margin={1.3}>
+        <Bounds key={modelUrl} fit clip observe margin={1.8}>
           {useFallback ? (
             <FallbackPet type={petType} autoRotate={autoRotate} />
           ) : (
             <ModelErrorBoundary fallback={<FallbackPet type={petType} autoRotate={autoRotate} />}>
-              <AnimatedModel url={modelUrl} autoRotate={autoRotate} />
+              <AnimatedModel key={modelUrl} url={modelUrl} autoRotate={autoRotate} />
             </ModelErrorBoundary>
           )}
         </Bounds>
@@ -297,8 +319,9 @@ function CanvasContent({
         <Environment preset="studio" />
       </Suspense>
       
-      {/* Camera controls */}
+      {/* Camera controls - key forces reset on model change */}
       <OrbitControls
+        key={modelUrl}
         enablePan={false}
         enableZoom={true}
         minDistance={3}
@@ -344,11 +367,17 @@ export default function Model3DViewer({
       <Canvas
         camera={{ position: [0, 2, 6], fov: 35 }}
         shadows
-        gl={{ antialias: true, alpha: true }}
+        gl={{ 
+          antialias: true, 
+          alpha: true,
+          powerPreference: 'high-performance',
+          failIfMajorPerformanceCaveat: false
+        }}
         onError={() => setCanvasError(true)}
         style={{ touchAction: 'none' }}
       >
         <CanvasContent
+          key={modelUrl}
           modelUrl={modelUrl}
           autoRotate={autoRotate}
           petType={petType}
