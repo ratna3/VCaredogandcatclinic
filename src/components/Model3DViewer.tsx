@@ -145,7 +145,7 @@ function AnimatedModel({ url, autoRotate = true }: ModelProps) {
     return clone;
   }, [scene]);
 
-  // Calculate model size and normalize scale
+  // Calculate model normalization scale and center offset for proper positioning
   const { centerOffset, normalizedScale } = useMemo(() => {
     const box = new THREE.Box3().setFromObject(clonedScene);
     const center = new THREE.Vector3();
@@ -153,9 +153,11 @@ function AnimatedModel({ url, autoRotate = true }: ModelProps) {
     box.getCenter(center);
     box.getSize(size);
     
-    // Calculate scale to normalize all models to a smaller target size for better visibility
+    // Calculate the max dimension
     const maxDim = Math.max(size.x, size.y, size.z);
-    const targetSize = 1.5; // Smaller target size to ensure full model fits in view
+    
+    // Target size for normalization - models should be roughly this size before Bounds handles them
+    const targetSize = 2;
     const scale = maxDim > 0 ? targetSize / maxDim : 1;
     
     // Center the model at the geometric center (not just bottom)
@@ -299,7 +301,7 @@ function CanvasContent({
       
       <Suspense fallback={<LoadingSpinner />}>
         {/* Bounds component to auto-fit the model in view */}
-        <Bounds key={modelUrl} fit clip observe margin={1.8}>
+        <Bounds key={modelUrl} fit clip observe margin={2.5}>
           {useFallback ? (
             <FallbackPet type={petType} autoRotate={autoRotate} />
           ) : (
@@ -316,7 +318,7 @@ function CanvasContent({
           blur={2.5}
           far={5}
         />
-        <Environment preset="studio" />
+        <Environment preset="apartment" />
       </Suspense>
       
       {/* Camera controls - key forces reset on model change */}
@@ -324,10 +326,10 @@ function CanvasContent({
         key={modelUrl}
         enablePan={false}
         enableZoom={true}
-        minDistance={3}
+        minDistance={2}
         maxDistance={15}
         autoRotate={false}
-        target={[0, 1, 0]}
+        target={[0, 0, 0]}
         minPolarAngle={Math.PI / 6}
         maxPolarAngle={Math.PI / 2}
       />
