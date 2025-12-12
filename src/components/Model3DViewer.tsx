@@ -157,7 +157,7 @@ function AnimatedModel({ url, autoRotate = true }: ModelProps) {
     const maxDim = Math.max(size.x, size.y, size.z);
     
     // Target size for normalization - models should be roughly this size before Bounds handles them
-    const targetSize = 3;
+    const targetSize = 5;
     const scale = maxDim > 0 ? targetSize / maxDim : 1;
     
     // Center the model at the geometric center (not just bottom)
@@ -186,15 +186,17 @@ function AnimatedModel({ url, autoRotate = true }: ModelProps) {
       // Create mixer for the cloned scene
       mixerRef.current = new THREE.AnimationMixer(clonedScene);
       
-      // Play only the first (main) animation clip to prevent glitchy overlapping animations
-      const mainClip = animations[0];
-      const action = mixerRef.current.clipAction(mainClip);
-      action.reset();
-      action.setLoop(THREE.LoopRepeat, Infinity);
-      action.clampWhenFinished = false;
-      action.setEffectiveTimeScale(1);
-      action.setEffectiveWeight(1);
-      action.play();
+      // Play all animation clips to ensure all parts of the model animate properly
+      // Some models (like Pitbull) have multiple clips that need to play together
+      animations.forEach((clip) => {
+        const action = mixerRef.current!.clipAction(clip);
+        action.reset();
+        action.setLoop(THREE.LoopRepeat, Infinity);
+        action.clampWhenFinished = false;
+        action.setEffectiveTimeScale(1);
+        action.setEffectiveWeight(1);
+        action.play();
+      });
     }
 
     return () => {
