@@ -130,7 +130,17 @@ export default function ShopPage() {
                   >
                     {/* Product Image */}
                     <div className="relative bg-royal-50 p-8 text-center">
-                      <span className="text-7xl">{product.image}</span>
+                      {product.image_url ? (
+                        <img
+                          src={product.image_url}
+                          alt={product.name || product.title || 'Product Image'}
+                          className="mx-auto w-32 h-32 object-cover rounded"
+                          loading="lazy"
+                          onError={e => { e.currentTarget.src = '/fallback-image.png'; }}
+                        />
+                      ) : (
+                        <span className="text-7xl">🛒</span>
+                      )}
                       {product.originalPrice && (
                         <span className="absolute top-4 left-4 bg-red-500 text-white 
                                          text-xs font-bold px-2 py-1 rounded">
