@@ -7,9 +7,10 @@ const pool = new Pool({
 });
 
 export async function POST(req: NextRequest) {
-  const { email, password } = await req.json();
-  const client = await pool.connect();
+  let client;
   try {
+    const { email, password } = await req.json();
+    client = await pool.connect();
     const result = await client.query(
       `SELECT * FROM admin_users WHERE email = $1`,
       [email]
@@ -33,7 +34,11 @@ export async function POST(req: NextRequest) {
     } else {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
+  } catch (error) {
+    // Log error details for debugging
+    console.error('Admin login error:', error);
+    return NextResponse.json({ error: 'Server error', details: error instanceof Error ? error.message : String(error) }, { status: 500 });
   } finally {
-    client.release();
+    if (client) client.release();
   }
 }
