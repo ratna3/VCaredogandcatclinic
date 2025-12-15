@@ -3,172 +3,46 @@
 import { useState } from 'react';
 import Link from 'next/link';
 
-const categories = ['All', 'Dog Food', 'Cat Food', 'Toys', 'Accessories', 'Health', 'Grooming'];
 
-const products = [
-  {
-    id: 1,
-    name: 'Premium Dog Food',
-    category: 'Dog Food',
-    price: 49.99,
-    originalPrice: 59.99,
-    image: '🦴',
-    rating: 4.8,
-    reviews: 124,
-    description: 'High-quality nutrition for adult dogs',
-    inStock: true,
-  },
-  {
-    id: 2,
-    name: 'Gourmet Cat Food',
-    category: 'Cat Food',
-    price: 39.99,
-    originalPrice: 45.99,
-    image: '🐟',
-    rating: 4.9,
-    reviews: 89,
-    description: 'Delicious and nutritious cat food',
-    inStock: true,
-  },
-  {
-    id: 3,
-    name: 'Interactive Dog Toy',
-    category: 'Toys',
-    price: 24.99,
-    originalPrice: null,
-    image: '🎾',
-    rating: 4.7,
-    reviews: 56,
-    description: 'Keeps your dog entertained for hours',
-    inStock: true,
-  },
-  {
-    id: 4,
-    name: 'Cat Scratching Post',
-    category: 'Toys',
-    price: 69.99,
-    originalPrice: 89.99,
-    image: '🐱',
-    rating: 4.6,
-    reviews: 42,
-    description: 'Multi-level scratching post with toys',
-    inStock: true,
-  },
-  {
-    id: 5,
-    name: 'Pet Carrier Bag',
-    category: 'Accessories',
-    price: 54.99,
-    originalPrice: null,
-    image: '👜',
-    rating: 4.8,
-    reviews: 78,
-    description: 'Comfortable and airline-approved',
-    inStock: true,
-  },
-  {
-    id: 6,
-    name: 'Flea & Tick Treatment',
-    category: 'Health',
-    price: 34.99,
-    originalPrice: 39.99,
-    image: '💊',
-    rating: 4.9,
-    reviews: 203,
-    description: '3-month protection for dogs',
-    inStock: true,
-  },
-  {
-    id: 7,
-    name: 'Pet Shampoo',
-    category: 'Grooming',
-    price: 14.99,
-    originalPrice: null,
-    image: '🧴',
-    rating: 4.5,
-    reviews: 67,
-    description: 'Gentle formula for sensitive skin',
-    inStock: true,
-  },
-  {
-    id: 8,
-    name: 'Royal Pet Bed',
-    category: 'Accessories',
-    price: 89.99,
-    originalPrice: 119.99,
-    image: '🛏️',
-    rating: 4.9,
-    reviews: 156,
-    description: 'Luxury orthopedic pet bed',
-    inStock: true,
-  },
-  {
-    id: 9,
-    name: 'Automatic Pet Feeder',
-    category: 'Accessories',
-    price: 79.99,
-    originalPrice: null,
-    image: '🍽️',
-    rating: 4.7,
-    reviews: 89,
-    description: 'Programmable feeding schedule',
-    inStock: false,
-  },
-  {
-    id: 10,
-    name: 'Dog Dental Chews',
-    category: 'Health',
-    price: 19.99,
-    originalPrice: 24.99,
-    image: '🦷',
-    rating: 4.6,
-    reviews: 134,
-    description: 'Cleans teeth and freshens breath',
-    inStock: true,
-  },
-  {
-    id: 11,
-    name: 'Pet Brush Set',
-    category: 'Grooming',
-    price: 29.99,
-    originalPrice: null,
-    image: '🪮',
-    rating: 4.8,
-    reviews: 45,
-    description: 'Complete grooming brush set',
-    inStock: true,
-  },
-  {
-    id: 12,
-    name: 'Puppy Training Pads',
-    category: 'Accessories',
-    price: 22.99,
-    originalPrice: null,
-    image: '📋',
-    rating: 4.4,
-    reviews: 98,
-    description: 'Super absorbent training pads',
-    inStock: true,
-  },
-];
+import { useEffect } from 'react';
+
+
+
 
 export default function ShopPage() {
+  const [categories, setCategories] = useState<string[]>(['All']);
+  const [products, setProducts] = useState<any[]>([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [sortBy, setSortBy] = useState('featured');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchData() {
+      setLoading(true);
+      const [catRes, prodRes] = await Promise.all([
+        fetch('/api/admin/categories'),
+        fetch('/api/admin/items'),
+      ]);
+      const catData = catRes.ok ? await catRes.json() : [];
+      const prodData = prodRes.ok ? await prodRes.json() : [];
+      setCategories(['All', ...catData.map((c: any) => c.name)]);
+      setProducts(prodData);
+      setLoading(false);
+    }
+    fetchData();
+  }, []);
 
   const filteredProducts =
     selectedCategory === 'All'
       ? products
-      : products.filter((p) => p.category === selectedCategory);
+      : products.filter((p: any) => p.category && p.category === selectedCategory);
 
-  const sortedProducts = [...filteredProducts].sort((a, b) => {
+  const sortedProducts = [...filteredProducts].sort((a: any, b: any) => {
     switch (sortBy) {
       case 'price-low':
-        return a.price - b.price;
+        return a.price_inr - b.price_inr;
       case 'price-high':
-        return b.price - a.price;
-      case 'rating':
-        return b.rating - a.rating;
+        return b.price_inr - a.price_inr;
       default:
         return 0;
     }
@@ -306,11 +180,11 @@ export default function ShopPage() {
                       {/* Price */}
                       <div className="flex items-center gap-2 mt-3">
                         <span className="text-xl font-bold text-royal-900">
-                          ${product.price}
+                          ₹{product.price_inr ?? product.price}
                         </span>
                         {product.originalPrice && (
                           <span className="text-sm text-gray-400 line-through">
-                            ${product.originalPrice}
+                            ₹{product.originalPrice}
                           </span>
                         )}
                       </div>

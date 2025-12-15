@@ -9,7 +9,12 @@ const pool = new Pool({
 export async function GET() {
   const client = await pool.connect();
   try {
-    const result = await client.query('SELECT id, title, image_url, price_inr, description FROM store_items ORDER BY id DESC');
+    const result = await client.query(`
+      SELECT s.id, s.title, s.image_url, s.price_inr, s.description, s.category_id, c.name as category
+      FROM store_items s
+      LEFT JOIN categories c ON s.category_id = c.id
+      ORDER BY s.id DESC
+    `);
     return NextResponse.json(result.rows);
   } finally {
     client.release();
@@ -31,15 +36,15 @@ export async function DELETE(req: NextRequest) {
 
 
 export async function POST(req: NextRequest) {
-  const { title, image_url, price_inr, description } = await req.json();
-  if (!title || !image_url || !price_inr || !description) {
+  const { title, image_url, price_inr, description, category_id } = await req.json();
+  if (!title || !image_url || !price_inr || !description || !category_id) {
     return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
   }
   const client = await pool.connect();
   try {
     const result = await client.query(
-      'INSERT INTO store_items (title, image_url, price_inr, description, created_at, updated_at) VALUES ($1, $2, $3, $4, now(), now()) RETURNING *',
-      [title, image_url, price_inr, description]
+      'INSERT INTO store_items (title, image_url, price_inr, description, category_id, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, now(), now()) RETURNING *',
+      [title, image_url, price_inr, description, category_id]
     );
     return NextResponse.json(result.rows[0]);
   } finally {
@@ -48,15 +53,15 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
-  const { id, title, image_url, price_inr, description } = await req.json();
-  if (!id || !title || !image_url || !price_inr || !description) {
+  const { id, title, image_url, price_inr, description, category_id } = await req.json();
+  if (!id || !title || !image_url || !price_inr || !description || !category_id) {
     return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
   }
   const client = await pool.connect();
   try {
     const result = await client.query(
-      'UPDATE store_items SET title = $1, image_url = $2, price_inr = $3, description = $4, updated_at = now() WHERE id = $5 RETURNING *',
-      [title, image_url, price_inr, description, id]
+      'UPDATE store_items SET title = $1, image_url = $2, price_inr = $3, description = $4, category_id = $5, updated_at = now() WHERE id = $6 RETURNING *',
+      [title, image_url, price_inr, description, category_id, id]
     );
     return NextResponse.json(result.rows[0]);
   } finally {

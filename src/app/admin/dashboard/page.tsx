@@ -2,34 +2,46 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
+interface Category {
+  id: number;
+  name: string;
+}
+
 interface StoreItem {
   id: number;
   title: string;
   image_url: string;
   price_inr: string;
   description: string;
+  category_id: number;
+  category: string;
 }
 
 export default function AdminDashboard() {
   const [items, setItems] = useState<StoreItem[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const router = useRouter();
 
   // Fetch items
   useEffect(() => {
-    const fetchItems = async () => {
+    const fetchData = async () => {
       setLoading(true);
-      const res = await fetch('/api/admin/items');
-      if (res.ok) {
-        setItems(await res.json());
+      const [itemsRes, categoriesRes] = await Promise.all([
+        fetch('/api/admin/items'),
+        fetch('/api/admin/categories'),
+      ]);
+      if (itemsRes.ok && categoriesRes.ok) {
+        setItems(await itemsRes.json());
+        setCategories(await categoriesRes.json());
       } else {
-        setError('Failed to load items');
+        setError('Failed to load data');
       }
       setLoading(false);
     };
-    fetchItems();
-    const interval = setInterval(fetchItems, 5000); // Real-time update every 5s
+    fetchData();
+    const interval = setInterval(fetchData, 5000); // Real-time update every 5s
     return () => clearInterval(interval);
   }, []);
 
@@ -53,13 +65,23 @@ export default function AdminDashboard() {
     description: '',
     image_url: '',
     imageFile: undefined as File | undefined,
+    category_id: '',
   });
   const [formMode, setFormMode] = useState<'add' | 'edit'>('add');
   const [formLoading, setFormLoading] = useState(false);
 
+  // Category form state
+  const [categoryForm, setCategoryForm] = useState({ id: undefined as number | undefined, name: '' });
+  const [categoryMode, setCategoryMode] = useState<'add' | 'edit'>('add');
+  const [categoryLoading, setCategoryLoading] = useState(false);
+
   // Handle form field changes
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm(f => ({ ...f, [e.target.name]: e.target.value }));
+  };
+
+  const handleCategoryFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setCategoryForm(f => ({ ...f, [e.target.name]: e.target.value }));
   };
 
   // Handle image file selection
@@ -99,10 +121,11 @@ export default function AdminDashboard() {
         price_inr: form.price_inr,
         description: form.description,
         image_url: imageUrl,
+        category_id: Number(form.category_id),
       })
     });
     if (res.ok) {
-      setForm({ id: undefined, title: '', price_inr: '', description: '', image_url: '', imageFile: undefined });
+      setForm({ id: undefined, title: '', price_inr: '', description: '', image_url: '', imageFile: undefined, category_id: '' });
       setFormMode('add');
       setError('');
       // Refresh items
@@ -114,6 +137,32 @@ export default function AdminDashboard() {
     setFormLoading(false);
   };
 
+  // Category CRUD
+  const handleCategorySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setCategoryLoading(true);
+    const method = categoryMode === 'add' ? 'POST' : 'PUT';
+    const res = await fetch('/api/admin/categories', {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: categoryForm.id,
+        name: categoryForm.name,
+      })
+    });
+    if (res.ok) {
+      setCategoryForm({ id: undefined, name: '' });
+      setCategoryMode('add');
+      setError('');
+      // Refresh categories
+      const categoriesRes = await fetch('/api/admin/categories');
+      if (categoriesRes.ok) setCategories(await categoriesRes.json());
+    } else {
+      setError('Failed to save category');
+    }
+    setCategoryLoading(false);
+  };
+
   // Edit item
   const handleEdit = (item: StoreItem) => {
     setForm({
@@ -123,14 +172,27 @@ export default function AdminDashboard() {
       description: item.description,
       image_url: item.image_url,
       imageFile: undefined,
+      category_id: String(item.category_id),
     });
     setFormMode('edit');
   };
 
+  // Edit category
+  const handleEditCategory = (category: Category) => {
+    setCategoryForm({ id: category.id, name: category.name });
+    setCategoryMode('edit');
+  };
+
   // Cancel edit
   const handleCancelEdit = () => {
-    setForm({ id: undefined, title: '', price_inr: '', description: '', image_url: '', imageFile: undefined });
+    setForm({ id: undefined, title: '', price_inr: '', description: '', image_url: '', imageFile: undefined, category_id: '' });
     setFormMode('add');
+  };
+
+  // Cancel category edit
+  const handleCancelCategoryEdit = () => {
+    setCategoryForm({ id: undefined, name: '' });
+    setCategoryMode('add');
   };
 
   return (
@@ -138,7 +200,53 @@ export default function AdminDashboard() {
       <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
       {error && <div className="text-red-500 mb-4">{error}</div>}
 
-      {/* Add/Edit Form */}
+      {/* Category CRUD */}
+      <form onSubmit={handleCategorySubmit} className="bg-white p-4 rounded shadow mb-8 max-w-xl">
+        <h2 className="text-xl font-semibold mb-2">{categoryMode === 'add' ? 'Add New Category' : 'Edit Category'}</h2>
+        <input
+          name="name"
+          value={categoryForm.name}
+          onChange={handleCategoryFormChange}
+          placeholder="Category Name"
+          className="w-full mb-2 p-2 border rounded"
+          required
+        />
+        <div className="flex gap-2">
+          <button type="submit" className="bg-blue-600 text-white px-4 py-2 rounded" disabled={categoryLoading}>
+            {categoryMode === 'add' ? 'Add Category' : 'Save Category'}
+          </button>
+          {categoryMode === 'edit' && (
+            <button type="button" onClick={handleCancelCategoryEdit} className="bg-gray-400 text-white px-4 py-2 rounded">Cancel</button>
+          )}
+        </div>
+      </form>
+      <div className="mb-8">
+        <h2 className="text-lg font-semibold mb-2">Categories</h2>
+        <table className="w-full border mb-4">
+          <thead>
+            <tr>
+              <th className="border p-2">Name</th>
+              <th className="border p-2">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {categories.map(category => (
+              <tr key={category.id}>
+                <td className="border p-2">{category.name}</td>
+                <td className="border p-2">
+                  <button
+                    className="bg-yellow-500 text-white px-2 py-1 rounded mr-2"
+                    onClick={() => handleEditCategory(category)}
+                  >Edit</button>
+                  {/* Category delete button can be added here if needed */}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Add/Edit Product Form */}
       <form onSubmit={handleFormSubmit} className="bg-white p-4 rounded shadow mb-8 max-w-xl">
         <h2 className="text-xl font-semibold mb-2">{formMode === 'add' ? 'Add New Product' : 'Edit Product'}</h2>
         <input
@@ -166,6 +274,18 @@ export default function AdminDashboard() {
           className="w-full mb-2 p-2 border rounded"
           required
         />
+        <select
+          name="category_id"
+          value={form.category_id}
+          onChange={handleFormChange}
+          className="w-full mb-2 p-2 border rounded"
+          required
+        >
+          <option value="">Select Category</option>
+          {categories.map(category => (
+            <option key={category.id} value={category.id}>{category.name}</option>
+          ))}
+        </select>
         <input
           type="file"
           accept="image/*"
@@ -195,6 +315,7 @@ export default function AdminDashboard() {
               <h2 className="text-xl font-semibold">{item.title}</h2>
               <div className="text-green-700 font-bold">₹{item.price_inr}</div>
               <p className="text-gray-700 text-sm mb-2">{item.description}</p>
+              <div className="text-gray-600 text-xs mb-2">Category: {item.category || '-'}</div>
               <div className="flex gap-2">
                 <button onClick={() => handleEdit(item)} className="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600">Edit</button>
                 <button onClick={() => handleRemove(item.id)} className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600">Remove</button>
