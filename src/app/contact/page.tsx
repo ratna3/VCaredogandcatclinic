@@ -128,7 +128,7 @@ export default function ContactPage() {
                       required
                       className="w-full px-4 py-3 rounded-lg border border-royal-200 
                                  focus:outline-none focus:ring-2 focus:ring-royal-500"
-                      placeholder="+1 (555) 123-4567"
+                      placeholder="+91 81880 00557"
                     />
                   </div>
                   <div>
