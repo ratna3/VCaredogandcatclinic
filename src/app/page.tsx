@@ -280,11 +280,11 @@ export default function HomePage() {
               Book Appointment Now
             </Link>
             <a
-              href="tel:+15551234567"
+              href="tel:+918188000557"
               className="px-8 py-4 bg-white text-royal-900 font-semibold rounded-lg 
                          hover:bg-royal-50 transition-all duration-300"
             >
-              Call: +1 (555) 123-4567
+              Call: +91 81880 00557
             </a>
           </div>
         </div>

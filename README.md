@@ -27,12 +27,14 @@ A modern veterinary clinic website built with Next.js and Three.js, featuring an
 ### Installation
 
 1. Clone the repository:
+
 ```bash
 git clone <repository-url>
 cd vcare-dog-cat-clinic
 ```
 
 2. Install dependencies:
+
 ```bash
 npm install
 ```
@@ -40,6 +42,7 @@ npm install
 3. Download 3D models (see `public/models/README.md` for instructions)
 
 4. Run the development server:
+
 ```bash
 npm run dev
 ```
@@ -71,14 +74,14 @@ public/
 
 ## 3D Model Credits
 
-### Dogs:
+### Dogs
 - **Labrador Dog** by kenchoo - [CC BY](https://skfb.ly/oRvAB)
 - **Animated Dog, Shiba Inu** by quander - [CC BY](https://skfb.ly/6SrJO)
 - **Animated Pitbull Dog** by Game-animal ripper - [CC BY](https://skfb.ly/pyJyU)
 - **Doberman** by kenchoo - [CC BY-NC-ND](https://skfb.ly/oSnnD)
 - **Chihuahua** by kenchoo - [CC BY](https://skfb.ly/oRIJB)
 
-### Cats:
+### Cats
 - **Sphynx Cat** by kenchoo - [CC BY-NC-ND](https://skfb.ly/oS7yP)
 - **Cat Walk** by Erina eka syaharani - [CC BY](https://skfb.ly/6S9AO)
 - **An Animated Cat** by Evil_Katz - [CC BY](https://skfb.ly/6YPwH)
@@ -98,4 +101,4 @@ This project is for educational/demo purposes. 3D models are licensed under thei
 
 VCare Dog and Cat Clinic
 - Email: info@vcaredogandcat.com
-- Phone: +1 (555) 123-4567
+- Phone: +91 81880 00557
