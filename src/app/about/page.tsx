@@ -2,32 +2,32 @@ import Link from 'next/link';
 
 const team = [
   {
-    name: 'Dr. Sarah Johnson',
+    name: 'Dr. Rahul Chandra',
     role: 'Chief Veterinarian',
-    specialty: 'Small Animal Medicine',
+    specialty: 'MVSC in Gynecology',
     image: '👩‍⚕️',
-    bio: 'With over 15 years of experience, Dr. Johnson leads our team with expertise in internal medicine and preventive care.',
+    bio: 'With over 30+ years of experience, Dr. Chandra leads our team with expertise in internal medicine and preventive care.',
   },
   {
-    name: 'Dr. Michael Chen',
-    role: 'Senior Veterinarian',
-    specialty: 'Surgery & Orthopedics',
+    name: 'Dr. Shabina Nisha',
+    role: 'Junior Veterinary Doctor',
+    specialty: 'BVSc&AH',
     image: '👨‍⚕️',
-    bio: 'Dr. Chen is our surgical specialist with advanced training in orthopedic and soft tissue procedures.',
+    bio: 'Dr. Nisha is our excellent clinician who is good in clinical diagnostics and laboratory diagnostics ',
   },
   {
-    name: 'Dr. Emily Rodriguez',
-    role: 'Veterinarian',
-    specialty: 'Feline Medicine',
+    name: 'Dr. Pulkit Tiwari',
+    role: 'Junior Veterinary Doctor',
+    specialty: 'Machine Operator & Laboratory Diagnostics',
     image: '👩‍⚕️',
-    bio: 'A certified feline practitioner, Dr. Rodriguez provides specialized care for our cat patients.',
+    bio: 'Dr. Tiwari specializes in diagnostic imaging and laboratory work, ensuring accurate diagnoses for our patients.',
   },
   {
-    name: 'Dr. James Wilson',
-    role: 'Veterinarian',
-    specialty: 'Exotic Animals',
+    name: 'Dr. Vaishnavi Agarwal',
+    role: 'Veterinarian Intern',
+    specialty: 'BVSc&AH',
     image: '👨‍⚕️',
-    bio: 'Dr. Wilson brings unique expertise in exotic and avian medicine to our diverse patient population.',
+    bio: 'Dr. Agarwal focuses on assisting junior doctors and providing compassionate care to all animals.',
   },
 ];
 
@@ -55,7 +55,7 @@ const values = [
 ];
 
 const milestones = [
-  { year: '2005', event: 'VCare Dog and Cat Clinic founded' },
+  { year: '2007', event: 'VCare Dog and Cat Clinic founded' },
   { year: '2010', event: 'Expanded to 24/7 emergency services' },
   { year: '2015', event: 'Opened state-of-the-art surgical wing' },
   { year: '2018', event: 'Added exotic animal care services' },
@@ -73,7 +73,7 @@ export default function AboutPage() {
             About VCare Clinic
           </h1>
           <p className="text-xl text-royal-100 max-w-2xl mx-auto">
-            Your trusted partner in pet healthcare since 2005. 
+            Your trusted partner in pet healthcare since 2007. 
             We&apos;re committed to providing royal treatment for every pet.
           </p>
         </div>
@@ -89,13 +89,13 @@ export default function AboutPage() {
               </h2>
               <div className="space-y-4 text-royal-700">
                 <p>
-                  VCare Dog and Cat Clinic was founded in 2005 with a simple mission: 
+                  VCare Dog and Cat Clinic was founded in 2007 with a simple mission: 
                   to provide exceptional veterinary care with compassion and expertise. 
                   What started as a small neighborhood clinic has grown into a 
                   full-service animal hospital serving thousands of pets each year.
                 </p>
                 <p>
-                  Our founder, Dr. Sarah Johnson, believed that every pet deserves 
+                  Our founder, Dr. Rahul Chandra, believed that every pet deserves 
                   royal treatment. This philosophy guides everything we do, from our 
                   gentle handling techniques to our state-of-the-art medical equipment.
                 </p>

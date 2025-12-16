@@ -256,9 +256,9 @@ export default function ContactPage() {
                         Our Location
                       </h3>
                       <p className="text-royal-600">
-                        123 Pet Care Street<br />
-                        Veterinary District<br />
-                        City, State 12345
+                        GF-96, Khazana Market Chauraha,<br />
+                        Sector K, Ashiyana,<br />
+                        Lucknow, Uttar Pradesh 226012
                       </p>
                     </div>
                   </div>
@@ -278,8 +278,8 @@ export default function ContactPage() {
                         Phone Numbers
                       </h3>
                       <p className="text-royal-600">
-                        Main: +1 (555) 123-4567<br />
-                        Emergency: +1 (555) 123-4568
+                        Main: +91 81880 00557<br />
+                        Emergency: +91 81880 00557
                       </p>
                     </div>
                   </div>
@@ -376,11 +376,11 @@ export default function ContactPage() {
               </div>
             </div>
             <a
-              href="tel:+15551234568"
+              href="tel:+918188000557"
               className="px-6 py-3 bg-red-600 text-white font-semibold rounded-lg 
                          hover:bg-red-700 transition-colors shadow-lg"
             >
-              Call Emergency Line: +1 (555) 123-4568
+              Call Emergency Line: +91 81880 00557
             </a>
           </div>
         </div>
