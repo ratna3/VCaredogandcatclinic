@@ -100,5 +100,5 @@ This project is for educational/demo purposes. 3D models are licensed under thei
 ## Contact
 
 VCare Dog and Cat Clinic
-- Email: info@vcaredogandcat.com
+- Email: vcaredogandcatcliniclko@gmail.com
 - Phone: +91 81880 00557
