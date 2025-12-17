@@ -110,7 +110,7 @@ export default function ContactPage() {
                       required
                       className="w-full px-4 py-3 rounded-lg border border-royal-200 
                                  focus:outline-none focus:ring-2 focus:ring-royal-500"
-                      placeholder="john@example.com"
+                      placeholder="vcaredogandcatcliniclko@gmail.com"
                     />
                   </div>
                 </div>
@@ -300,8 +300,8 @@ export default function ContactPage() {
                         Email Address
                       </h3>
                       <p className="text-royal-600">
-                        info@vcaredogandcat.com<br />
-                        appointments@vcaredogandcat.com
+                        vcaredogandcatcliniclko@gmail.com<br />
+                        vcaredogandcatcliniclko@gmail.com
                       </p>
                     </div>
                   </div>
