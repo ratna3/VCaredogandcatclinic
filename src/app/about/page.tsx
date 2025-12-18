@@ -18,7 +18,7 @@ const team = [
   {
     name: 'Dr. Pulkit Tiwari',
     role: 'Junior Veterinary Doctor',
-    specialty: 'Machine Operator & Laboratory Diagnostics',
+    specialty: 'BVSc&AH',
     image: '👨‍⚕️',
     bio: 'Dr. Tiwari specializes in diagnostic imaging and laboratory work, ensuring accurate diagnoses for our patients.',
   },
