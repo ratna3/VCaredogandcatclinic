@@ -1,6 +1,6 @@
 # VCare Dog and Cat Clinic - Website
 
-A modern veterinary clinic website built with Next.js and Three.js, featuring animated 3D pet models.
+A modern veterinary clinic website built with Next.js and Three.js, featuring animated 3D pet models and Teleconsultation.
 
 ## Features
 
