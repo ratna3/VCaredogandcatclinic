@@ -42,7 +42,7 @@ export default function ContactPage() {
               Appointment Request Received!
             </h2>
             <p className="text-green-700 mb-6">
-              Thank you for choosing VCare Dog and Cat Clinic. We&apos;ll contact you 
+              Thank you for choosing VCare Dog and Cat Clinic. We&apos;ll contact you
               within 24 hours to confirm your appointment.
             </p>
             <button
@@ -66,14 +66,14 @@ export default function ContactPage() {
             Contact Us
           </h1>
           <p className="text-xl text-royal-100 max-w-2xl mx-auto">
-            Have questions or ready to book an appointment? 
+            Have questions or ready to book an appointment?
             We&apos;re here to help your pet get the care they deserve.
           </p>
         </div>
       </section>
 
       {/* Contact Content */}
-      <section className="py-16">
+      <section className="py-16 mesh-bg">
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12">
             {/* Contact Form */}
@@ -236,7 +236,7 @@ export default function ContactPage() {
               <h2 className="text-2xl font-display font-bold text-royal-900 mb-6">
                 Get in Touch
               </h2>
-              
+
               <div className="space-y-6">
                 {/* Location */}
                 <div className="bg-royal-50 rounded-xl p-6">

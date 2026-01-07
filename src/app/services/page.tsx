@@ -109,14 +109,14 @@ export default function ServicesPage() {
             Our Services
           </h1>
           <p className="text-xl text-royal-100 max-w-2xl mx-auto">
-            Comprehensive veterinary care for all your pet&apos;s needs. 
+            Comprehensive veterinary care for all your pet&apos;s needs.
             From routine checkups to emergency services, we&apos;ve got you covered.
           </p>
         </div>
       </section>
 
       {/* Services Grid */}
-      <section className="py-16">
+      <section className="py-16 mesh-bg">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {services.map((service, index) => (
@@ -168,13 +168,13 @@ export default function ServicesPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-royal-50">
+      <section className="py-16 section-warm paw-pattern">
         <div className="container mx-auto px-4 text-center">
           <h2 className="text-3xl font-display font-bold text-royal-900 mb-4">
             Not Sure What Your Pet Needs?
           </h2>
           <p className="text-royal-600 max-w-2xl mx-auto mb-8">
-            Our experienced veterinarians are here to help. Schedule a consultation 
+            Our experienced veterinarians are here to help. Schedule a consultation
             and we&apos;ll recommend the best care plan for your pet.
           </p>
           <Link href="/contact" className="btn-gold inline-block">

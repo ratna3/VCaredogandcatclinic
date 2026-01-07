@@ -5,6 +5,13 @@
 			"url": "https://mcp.neon.tech/sse",
 			"gallery": "https://api.mcp.github.com",
 			"version": "1.0.0"
+		},
+		"sequential-thinking": {
+			"command": "npx",
+			"args": [
+				"-y",
+				"@modelcontextprotocol/server-sequential-thinking"
+			]
 		}
 	},
 	"inputs": []

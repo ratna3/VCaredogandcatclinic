@@ -61,8 +61,8 @@ export default function HomePage() {
   return (
     <div className="bg-white">
       {/* Hero Section */}
-      <section className="relative hero-pattern bg-white overflow-hidden">
-        <div className="absolute inset-0 royal-gradient-light opacity-50"></div>
+      <section className="relative hero-pattern dynamic-bg overflow-hidden">
+        <div className="absolute inset-0 paw-pattern opacity-30"></div>
         <div className="container mx-auto px-4 py-16 md:py-24 relative z-10">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="text-center lg:text-left">
@@ -77,8 +77,8 @@ export default function HomePage() {
                 <span className="text-gold-500">Beloved Pets</span>
               </h1>
               <p className="text-lg md:text-xl text-royal-700 mb-8 max-w-xl mx-auto lg:mx-0">
-                At VCare Dog and Cat Clinic, we provide exceptional veterinary care 
-                for all animals. From routine checkups to emergency services, your 
+                At VCare Dog and Cat Clinic, we provide exceptional veterinary care
+                for all animals. From routine checkups to emergency services, your
                 pet&apos;s health is our priority.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
@@ -107,14 +107,14 @@ export default function HomePage() {
       </section>
 
       {/* Animals We Treat Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 mesh-bg">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-display font-bold text-royal-900 mb-4">
               We Treat All Your Furry Friends
             </h2>
             <p className="text-royal-600 max-w-2xl mx-auto">
-              From common household pets to exotic animals, our experienced veterinarians 
+              From common household pets to exotic animals, our experienced veterinarians
               provide specialized care for every type of animal.
             </p>
           </div>
@@ -137,21 +137,21 @@ export default function HomePage() {
       </section>
 
       {/* Featured Dogs Section */}
-      <section className="py-16 royal-gradient-light">
+      <section className="py-16 section-warm paw-pattern">
         <div className="container mx-auto px-4">
           <ModelCarousel models={dogModels} title="Meet Our Canine Friends 🐕" />
         </div>
       </section>
 
       {/* Services Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 section-light">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-display font-bold text-royal-900 mb-4">
               Our Premium Services
             </h2>
             <p className="text-royal-600 max-w-2xl mx-auto">
-              We offer a comprehensive range of veterinary services to ensure your 
+              We offer a comprehensive range of veterinary services to ensure your
               pet receives the best possible care.
             </p>
           </div>
@@ -175,14 +175,14 @@ export default function HomePage() {
       </section>
 
       {/* Featured Cats Section */}
-      <section className="py-16 royal-gradient-light">
+      <section className="py-16 section-warm paw-pattern">
         <div className="container mx-auto px-4">
           <ModelCarousel models={catModels} title="Meet Our Feline Friends 🐈" />
         </div>
       </section>
 
       {/* Why Choose Us Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 mesh-bg">
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -239,7 +239,7 @@ export default function HomePage() {
                 Royal Treatment for Every Pet
               </h3>
               <p className="text-royal-600 mb-6">
-                Your pets deserve nothing but the best. At VCare, we treat every 
+                Your pets deserve nothing but the best. At VCare, we treat every
                 animal like royalty with personalized care and attention.
               </p>
               <div className="grid grid-cols-3 gap-4 text-center">
@@ -268,7 +268,7 @@ export default function HomePage() {
             Ready to Give Your Pet Royal Treatment?
           </h2>
           <p className="text-royal-100 max-w-2xl mx-auto mb-8">
-            Book an appointment today and experience the VCare difference. 
+            Book an appointment today and experience the VCare difference.
             Your pet&apos;s health and happiness are our top priority.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -291,7 +291,7 @@ export default function HomePage() {
       </section>
 
       {/* 3D Model Credits Section */}
-      <section className="py-12 bg-royal-50">
+      <section className="py-12 section-light paw-pattern">
         <div className="container mx-auto px-4">
           <h3 className="text-xl font-display font-semibold text-royal-800 mb-6 text-center">
             3D Model Credits

@@ -73,14 +73,14 @@ export default function AboutPage() {
             About VCare Clinic
           </h1>
           <p className="text-xl text-royal-100 max-w-2xl mx-auto">
-            Your trusted partner in pet healthcare since 2007. 
+            Your trusted partner in pet healthcare since 2007.
             We&apos;re committed to providing royal treatment for every pet.
           </p>
         </div>
       </section>
 
       {/* Story Section */}
-      <section className="py-16">
+      <section className="py-16 mesh-bg">
         <div className="container mx-auto px-4">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
@@ -89,20 +89,20 @@ export default function AboutPage() {
               </h2>
               <div className="space-y-4 text-royal-700">
                 <p>
-                  VCare Dog and Cat Clinic was founded in 2007 with a simple mission: 
-                  to provide exceptional veterinary care with compassion and expertise. 
-                  What started as a small neighborhood clinic has grown into a 
+                  VCare Dog and Cat Clinic was founded in 2007 with a simple mission:
+                  to provide exceptional veterinary care with compassion and expertise.
+                  What started as a small neighborhood clinic has grown into a
                   full-service animal hospital serving thousands of pets each year.
                 </p>
                 <p>
-                  Our founder, Dr. Rahul Chandra, believed that every pet deserves 
-                  royal treatment. This philosophy guides everything we do, from our 
+                  Our founder, Dr. Rahul Chandra, believed that every pet deserves
+                  royal treatment. This philosophy guides everything we do, from our
                   gentle handling techniques to our state-of-the-art medical equipment.
                 </p>
                 <p>
-                  Today, we&apos;re proud to serve not just dogs and cats, but all kinds 
-                  of animals including birds, rabbits, reptiles, and other exotic pets. 
-                  Our diverse team of specialists ensures that every animal receives 
+                  Today, we&apos;re proud to serve not just dogs and cats, but all kinds
+                  of animals including birds, rabbits, reptiles, and other exotic pets.
+                  Our diverse team of specialists ensures that every animal receives
                   the specialized care they need.
                 </p>
               </div>
@@ -133,7 +133,7 @@ export default function AboutPage() {
       </section>
 
       {/* Values Section */}
-      <section className="py-16 bg-royal-50">
+      <section className="py-16 section-warm paw-pattern">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-display font-bold text-royal-900 mb-4">
@@ -162,7 +162,7 @@ export default function AboutPage() {
       </section>
 
       {/* Team Section */}
-      <section className="py-16">
+      <section className="py-16 section-light">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-display font-bold text-royal-900 mb-4">
@@ -197,7 +197,7 @@ export default function AboutPage() {
       </section>
 
       {/* Timeline Section */}
-      <section className="py-16 bg-royal-50">
+      <section className="py-16 section-warm paw-pattern">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-display font-bold text-royal-900 mb-4">
