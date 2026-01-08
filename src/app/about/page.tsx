@@ -36,43 +36,51 @@ const values = [
     icon: '❤️',
     title: 'Compassion',
     description: 'We treat every pet with love and kindness, understanding they are family members.',
+    color: 'from-red-100 to-orange-100',
   },
   {
     icon: '🏆',
     title: 'Excellence',
     description: 'We strive for the highest standards in veterinary medicine and patient care.',
+    color: 'from-amber-100 to-yellow-100',
   },
   {
     icon: '🤝',
     title: 'Trust',
     description: 'We build lasting relationships with pet owners based on transparency and honesty.',
+    color: 'from-blue-100 to-indigo-100',
   },
   {
     icon: '📚',
     title: 'Education',
     description: 'We empower pet owners with knowledge to make informed decisions about their pet\'s health.',
+    color: 'from-green-100 to-emerald-100',
   },
 ];
 
 const milestones = [
-  { year: '2007', event: 'VCare Dog and Cat Clinic founded' },
-  { year: '2010', event: 'Expanded to 24/7 emergency services' },
-  { year: '2015', event: 'Opened state-of-the-art surgical wing' },
-  { year: '2018', event: 'Added exotic animal care services' },
-  { year: '2020', event: 'Celebrated 10,000+ happy pets treated' },
-  { year: '2023', event: 'Introduced advanced diagnostic imaging' },
+  { year: '2007', event: 'VCare Dog and Cat Clinic founded', icon: '🎉' },
+  { year: '2010', event: 'Expanded to 24/7 emergency services', icon: '🚨' },
+  { year: '2015', event: 'Opened state-of-the-art surgical wing', icon: '🏥' },
+  { year: '2018', event: 'Added exotic animal care services', icon: '🦎' },
+  { year: '2020', event: 'Celebrated 10,000+ happy pets treated', icon: '🎊' },
+  { year: '2023', event: 'Introduced advanced diagnostic imaging', icon: '📷' },
 ];
 
 export default function AboutPage() {
   return (
-    <div className="bg-white">
+    <div className="bg-cream-50">
       {/* Hero Section */}
-      <section className="royal-gradient py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl md:text-5xl font-display font-bold text-white mb-4">
+      <section className="royal-gradient-premium py-20 relative overflow-hidden">
+        <div className="absolute inset-0 paw-pattern opacity-10"></div>
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <span className="inline-block px-4 py-1.5 bg-white/20 text-white rounded-full text-sm font-semibold mb-6 backdrop-blur-sm">
+            Our Story
+          </span>
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-display font-bold text-white mb-6">
             About VCare Clinic
           </h1>
-          <p className="text-xl text-royal-100 max-w-2xl mx-auto">
+          <p className="text-xl text-white/90 max-w-2xl mx-auto">
             Your trusted partner in pet healthcare since 2007.
             We&apos;re committed to providing royal treatment for every pet.
           </p>
@@ -80,14 +88,17 @@ export default function AboutPage() {
       </section>
 
       {/* Story Section */}
-      <section className="py-16 mesh-bg">
+      <section className="py-20 mesh-bg">
         <div className="container mx-auto px-4">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
-              <h2 className="text-3xl md:text-4xl font-display font-bold text-royal-900 mb-6">
+              <span className="inline-block px-4 py-1.5 bg-amber-100 text-amber-700 rounded-full text-sm font-semibold mb-4">
+                Our Journey
+              </span>
+              <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-royal-900 mb-8">
                 Our Story
               </h2>
-              <div className="space-y-4 text-royal-700">
+              <div className="space-y-6 text-charcoal-600 leading-relaxed">
                 <p>
                   VCare Dog and Cat Clinic was founded in 2007 with a simple mission:
                   to provide exceptional veterinary care with compassion and expertise.
@@ -107,24 +118,26 @@ export default function AboutPage() {
                 </p>
               </div>
             </div>
-            <div className="bg-royal-50 rounded-2xl p-8">
-              <div className="text-8xl text-center mb-6">🏥</div>
+
+            {/* Stats Card */}
+            <div className="premium-card text-center">
+              <div className="text-8xl mb-8">🏥</div>
               <div className="grid grid-cols-2 gap-6">
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-royal-900">18+</div>
-                  <div className="text-royal-600">Years of Service</div>
+                <div className="stat-badge">
+                  <div className="stat-number">18+</div>
+                  <div className="text-charcoal-600 font-medium mt-1">Years of Service</div>
                 </div>
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-royal-900">10K+</div>
-                  <div className="text-royal-600">Happy Pets</div>
+                <div className="stat-badge">
+                  <div className="stat-number">10K+</div>
+                  <div className="text-charcoal-600 font-medium mt-1">Happy Pets</div>
                 </div>
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-royal-900">15+</div>
-                  <div className="text-royal-600">Expert Staff</div>
+                <div className="stat-badge">
+                  <div className="stat-number">15+</div>
+                  <div className="text-charcoal-600 font-medium mt-1">Expert Staff</div>
                 </div>
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-royal-900">24/7</div>
-                  <div className="text-royal-600">Emergency Care</div>
+                <div className="stat-badge">
+                  <div className="stat-number">24/7</div>
+                  <div className="text-charcoal-600 font-medium mt-1">Emergency Care</div>
                 </div>
               </div>
             </div>
@@ -133,13 +146,16 @@ export default function AboutPage() {
       </section>
 
       {/* Values Section */}
-      <section className="py-16 section-warm paw-pattern">
+      <section className="py-20 section-warm paw-pattern">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-display font-bold text-royal-900 mb-4">
+          <div className="text-center mb-14">
+            <span className="inline-block px-4 py-1.5 bg-white/80 text-amber-700 rounded-full text-sm font-semibold mb-4">
+              What We Stand For
+            </span>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-royal-900 mb-4">
               Our Core Values
             </h2>
-            <p className="text-royal-600 max-w-2xl mx-auto">
+            <p className="text-charcoal-600 max-w-2xl mx-auto text-lg">
               These principles guide our practice and shape the care we provide.
             </p>
           </div>
@@ -147,14 +163,18 @@ export default function AboutPage() {
             {values.map((value, index) => (
               <div
                 key={index}
-                className="bg-white rounded-xl p-6 text-center 
-                           shadow-lg hover:shadow-xl transition-all duration-300"
+                className="premium-card text-center group"
+                style={{ animationDelay: `${index * 100}ms` }}
               >
-                <span className="text-5xl block mb-4">{value.icon}</span>
-                <h3 className="text-xl font-display font-semibold text-royal-900 mb-2">
+                <div className={`w-16 h-16 rounded-2xl mx-auto mb-5 flex items-center justify-center 
+                                bg-gradient-to-br ${value.color} transition-transform duration-300 
+                                group-hover:scale-110`}>
+                  <span className="text-3xl">{value.icon}</span>
+                </div>
+                <h3 className="text-xl font-display font-semibold text-royal-900 mb-3">
                   {value.title}
                 </h3>
-                <p className="text-royal-600 text-sm">{value.description}</p>
+                <p className="text-charcoal-600 text-sm leading-relaxed">{value.description}</p>
               </div>
             ))}
           </div>
@@ -162,13 +182,16 @@ export default function AboutPage() {
       </section>
 
       {/* Team Section */}
-      <section className="py-16 section-light">
+      <section className="py-20 section-cream">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-display font-bold text-royal-900 mb-4">
+          <div className="text-center mb-14">
+            <span className="inline-block px-4 py-1.5 bg-amber-100 text-amber-700 rounded-full text-sm font-semibold mb-4">
+              The Experts
+            </span>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-royal-900 mb-4">
               Meet Our Team
             </h2>
-            <p className="text-royal-600 max-w-2xl mx-auto">
+            <p className="text-charcoal-600 max-w-2xl mx-auto text-lg">
               Our experienced veterinarians and staff are dedicated to your pet&apos;s health.
             </p>
           </div>
@@ -176,19 +199,22 @@ export default function AboutPage() {
             {team.map((member, index) => (
               <div
                 key={index}
-                className="bg-white rounded-xl border border-royal-100 overflow-hidden 
-                           hover:shadow-lg transition-all duration-300"
+                className="premium-card overflow-hidden group"
+                style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className="bg-royal-100 p-8 text-center">
-                  <span className="text-7xl">{member.image}</span>
+                <div className="bg-gradient-to-br from-amber-100 to-orange-100 p-8 text-center 
+                                -mx-8 -mt-8 mb-6 relative">
+                  <div className="absolute inset-0 paw-pattern opacity-30"></div>
+                  <span className="text-7xl relative z-10 transition-transform duration-300 
+                                   inline-block group-hover:scale-110">{member.image}</span>
                 </div>
-                <div className="p-6">
-                  <h3 className="font-display font-semibold text-royal-900">
+                <div className="text-center">
+                  <h3 className="font-display font-semibold text-royal-900 text-lg">
                     {member.name}
                   </h3>
-                  <p className="text-gold-600 font-medium text-sm">{member.role}</p>
-                  <p className="text-royal-500 text-sm mt-1">{member.specialty}</p>
-                  <p className="text-royal-600 text-sm mt-3">{member.bio}</p>
+                  <p className="text-gradient font-medium text-sm mt-1">{member.role}</p>
+                  <p className="text-charcoal-500 text-sm mt-1">{member.specialty}</p>
+                  <p className="text-charcoal-600 text-sm mt-4 leading-relaxed">{member.bio}</p>
                 </div>
               </div>
             ))}
@@ -197,24 +223,29 @@ export default function AboutPage() {
       </section>
 
       {/* Timeline Section */}
-      <section className="py-16 section-warm paw-pattern">
+      <section className="py-20 section-warm paw-pattern">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-display font-bold text-royal-900 mb-4">
+          <div className="text-center mb-14">
+            <span className="inline-block px-4 py-1.5 bg-white/80 text-amber-700 rounded-full text-sm font-semibold mb-4">
+              Milestones
+            </span>
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-royal-900 mb-4">
               Our Journey
             </h2>
           </div>
           <div className="max-w-3xl mx-auto">
             {milestones.map((milestone, index) => (
-              <div key={index} className="flex gap-6 mb-8 last:mb-0">
+              <div key={index} className="flex gap-6 mb-8 last:mb-0 group">
                 <div className="flex-shrink-0">
-                  <div className="w-16 h-16 rounded-full bg-royal-900 text-white 
-                                  flex items-center justify-center font-bold">
-                    {milestone.year}
+                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-royal-800 to-royal-950 
+                                  text-white flex flex-col items-center justify-center shadow-lg 
+                                  group-hover:shadow-warm transition-all duration-300 group-hover:scale-105">
+                    <span className="text-xl">{milestone.icon}</span>
+                    <span className="text-sm font-bold mt-1">{milestone.year}</span>
                   </div>
                 </div>
-                <div className="pt-3">
-                  <p className="text-royal-800 font-medium">{milestone.event}</p>
+                <div className="pt-5">
+                  <p className="text-charcoal-800 font-medium text-lg">{milestone.event}</p>
                 </div>
               </div>
             ))}
@@ -223,18 +254,20 @@ export default function AboutPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="royal-gradient py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-4xl font-display font-bold text-white mb-4">
+      <section className="royal-gradient-premium py-20 relative overflow-hidden">
+        <div className="absolute inset-0 paw-pattern opacity-10"></div>
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-display font-bold text-white mb-6">
             Ready to Join the VCare Family?
           </h2>
-          <p className="text-royal-100 max-w-2xl mx-auto mb-8">
+          <p className="text-white/90 max-w-2xl mx-auto mb-10 text-lg">
             Schedule your first visit today and experience the difference of royal pet care.
           </p>
           <Link
             href="/contact"
-            className="px-8 py-4 bg-gold-500 text-white font-semibold rounded-lg 
-                       hover:bg-gold-600 transition-all duration-300 shadow-lg inline-block"
+            className="px-8 py-4 bg-white text-royal-900 font-bold rounded-xl 
+                       hover:bg-cream-100 transition-all duration-300 shadow-xl 
+                       hover:shadow-2xl hover:-translate-y-1 inline-block text-lg"
           >
             Book Your First Visit
           </Link>
